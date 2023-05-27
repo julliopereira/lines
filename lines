@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+# author	: Julio C. Pereira
+# contact	: <julliopereira@gmail.com> 
+# github	: https://github.com/julliopereira/lines
+# goal		: look specific lines of a file
+# v1.0            Julio C. Pereira <julliopereira@gmail.com> 
+#                 2023-05-26
+#                 started
+# v1.1            Julio C. Pereira <julliopereira@gmail.com>
+#                 2023-05-27
+#                 Version option added  
+ 
+# MESAGES
+HELP="
+Use: $(basename $0) [OPC] FILE
+	-s, --start N	Must be the first option with number of initial line
+	-e, --end   N	Used after -s with number of last line
+	-p, --pause N	Look file lines with pause of N lines
+	-v, --version   Show the Current Version information
+	-h, --help	This HELP !!!
+
+	Examples:
+		show the lines from 20 until 50
+		$(basename $0) -s 20 -e 50 
+
+		show the lines from 20 until the end
+		$(basename $0) -s 20
+
+		show the lines from 1 until 50
+		$(basename $0) -e 50
+"
+
+# VARIABLES
+c=1
+S="V"
+E="V"
+P="V"
+# FUNCTIONS
+CheckSyntax () {
+	if [[ "$P" = "V" && "$S" =~ ^[0-9]+$ && "$E" =~ ^[0-9]+$ && "$E" > "$S" ]] ;then
+		RUN=1
+	elif [[ "$P" =~ ^[0-9]+$ && "$S" = "V" && "$E" = "V" ]] ;then
+		RUN=2
+	else
+		echo -e "$HELP" ; exit 1
+	fi		
+}
+
+FromUntil () {
+	echo "INI: $S  END: $E "
+} 
+
+Pause () {
+	echo "PAUSE: $P"
+} 
+
+# EXECUTION
+if [ $1 ] ; then
+  while [ $1 ] ; do
+      case $1 in
+      		-s|--start) shift; [ $1 ] && S=$1;shift                         ;;
+		  -e|--end) shift; [ $1 ] && E=$1;shift                         ;;
+		-p|--pause) shift; [ $1 ] && P=$1;shift                         ;;
+	      -v|--version) egrep -A 3 "^# v" $0 | tail -n 4| sed "s/#//";shift ;;
+		 -h|--help) echo -e "$HELP"; exit 1                             ;;
+	                 *) echo -e "Incorrect ...\n$HELP";exit 1               ;;	 
+      esac	
+  done
+else
+  echo -e "$HELP" ; exit 1
+fi
+CheckSyntax
+# SHOW RESULT TO USER
+if [ "$RUN" -eq "1" ]; then
+	FromUntil
+elif [ "$RUN" -eq "2" ];then
+	Pause
+fi
+# END
+exit 0
